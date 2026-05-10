@@ -1,11 +1,10 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useData } from "@/contexts/DataContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, MessageCircle, Languages } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 import { companyInfo } from "@/data/products";
 import { resolveMediaUrl } from "@/lib/media";
 import { Helmet } from "react-helmet";
@@ -14,20 +13,6 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { products } = useData();
   const product = products.find((p) => p.slug === id);
-  const [showEnglish, setShowEnglish] = useState(false);
-
-  // SEO metadata
-  const metaTitle = showEnglish 
-    ? ((product as any)?.meta_title || product?.name)
-    : ((product as any)?.meta_title_ar || product?.name_ar);
-  
-  const metaDescription = showEnglish
-    ? ((product as any)?.meta_description || product?.description?.substring(0, 160))
-    : ((product as any)?.meta_description_ar || product?.description_ar?.substring(0, 160));
-  
-  const metaKeywords = showEnglish
-    ? ((product as any)?.meta_keywords || '')
-    : ((product as any)?.meta_keywords_ar || '');
 
   if (!product) {
     return (
@@ -43,6 +28,11 @@ const ProductDetail = () => {
       </>
     );
   }
+
+  // SEO metadata
+  const metaTitle = (product as any)?.meta_title_ar || product?.name_ar;
+  const metaDescription = (product as any)?.meta_description_ar || product?.description_ar?.substring(0, 160);
+  const metaKeywords = (product as any)?.meta_keywords_ar || '';
 
   return (
     <>
@@ -86,13 +76,16 @@ const ProductDetail = () => {
                 <h1 className="text-2xl md:text-3xl font-bold text-foreground">{product.name_ar}</h1>
                 {!product.available && <Badge variant="destructive">غير متاح</Badge>}
               </div>
+              
               {product.sku && (
                 <div className="mb-2">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-muted/50 text-muted-foreground border border-border/50 text-sm font-mono tracking-wider shadow-sm" dir="ltr">
-                    <span className="mr-1.5 font-sans font-medium">رمز التخزين:</span> {product.sku}
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-muted/50 text-muted-foreground border border-border/50 text-sm shadow-sm">
+                    <span className="ml-1.5 font-medium">رمز التخزين:</span> 
+                    <span className="font-mono tracking-wider">{product.sku}</span>
                   </span>
                 </div>
               )}
+              
               <p className="text-sm text-muted-foreground mb-4">{product.name}</p>
               <p className="text-2xl font-bold text-primary mb-6">{product.price} د.ل</p>
               
@@ -100,21 +93,9 @@ const ProductDetail = () => {
                 <div 
                   className="text-muted-foreground leading-relaxed mb-3"
                   dangerouslySetInnerHTML={{ 
-                    __html: showEnglish 
-                      ? (product.description || '') 
-                      : (product.description_ar || '')
+                    __html: product.description_ar || ''
                   }}
-                  dir={showEnglish ? "ltr" : "rtl"}
                 />
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setShowEnglish(!showEnglish)}
-                  className="gap-1.5 bg-primary hover:bg-primary/90 text-xs px-3 py-1 h-auto"
-                >
-                  <Languages size={14} />
-                  {showEnglish ? "عربي" : "English"}
-                </Button>
               </div>
 
               <div className="mb-8">
