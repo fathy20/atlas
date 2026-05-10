@@ -1,84 +1,47 @@
-# Welcome to your Lovable project
+# Atlas - أطلس ⚡🏠
 
-## Project info
+**Atlas (أطلس)** هو منصة إلكترونية متكاملة لشركة رائدة في مجال بيع واستيراد المستلزمات الكهربائية والأجهزة المنزلية (تأسست عام 1988). يهدف المشروع إلى تقديم واجهة عرض احترافية للمنتجات مع لوحة تحكم (Dashboard) متطورة لإدارة المحتوى والمنتجات بكل سهولة.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🌟 مميزات المشروع (Features)
 
-## How can I edit this code?
+*   **واجهة مستخدم احترافية (Storefront):** تصميم عصري (Glassmorphism) مخصص باللون الأزرق ليتناسب مع هوية الشركة، متوافق تماماً مع جميع الشاشات (Responsive).
+*   **لوحة تحكم متكاملة (Admin Dashboard):** إدارة كاملة للمنتجات، الأقسام، العلامات التجارية، وإعدادات الـ SEO.
+*   **محرر نصوص متطور (Rich Text Editor):** محرر نصوص يشبه WordPress يتيح للمشرفين تنسيق وصف المنتجات، إضافة جداول، تغيير الألوان، إدراج صور، والتحكم في حجم الخط.
+*   **إدارة المخزون (SKU Management):** نظام مدمج لإضافة وعرض "رمز التخزين / رقم القطعة" لكل منتج، مما يسهل على العملاء والشركة تتبع المنتجات.
+*   **باندل زمني (Company Timeline):** عرض تفاعلي وجذاب لتاريخ الشركة ومحطاتها الرئيسية منذ عام 1988 وحتى اليوم.
+*   **تهيئة محركات البحث (SEO):** نظام متقدم للتحكم في الـ SEO والـ Meta tags لكل صفحة لضمان أفضل ظهور في محركات البحث.
+*   **فلترة وبحث متقدم:** فلترة المنتجات حسب القسم (كهربائية/منزلية)، العلامة التجارية، والتوافر، مع خاصية البحث المباشر.
 
-There are several ways of editing your application.
+## 🛠️ التقنيات المستخدمة (Tech Stack)
 
-**Use Lovable**
+*   **الواجهة الأمامية (Frontend):** React.js, TypeScript, Vite
+*   **التصميم (Styling):** Tailwind CSS, Shadcn UI, Framer Motion (للحركات التفاعلية)
+*   **قاعدة البيانات والخادم (Backend & DB):** Supabase (PostgreSQL)
+*   **إدارة الحالة (State Management):** React Context API
+*   **التوجيه (Routing):** React Router DOM
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🚀 كيفية التشغيل محلياً (Running Locally)
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **تثبيت الحزم:**
+   \`\`\`bash
+   npm install
+   \`\`\`
 
-**Use your preferred IDE**
+2. **إعداد متغيرات البيئة:**
+   قم بإنشاء ملف \`.env\` وأضف مفاتيح Supabase الخاصة بك:
+   \`\`\`env
+   VITE_SUPABASE_PROJECT_ID="your_project_id"
+   VITE_SUPABASE_URL="your_supabase_url"
+   VITE_SUPABASE_PUBLISHABLE_KEY="your_anon_key"
+   \`\`\`
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. **تشغيل خادم التطوير:**
+   \`\`\`bash
+   npm run dev
+   \`\`\`
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🗄️ إعداد قاعدة البيانات (Database Setup)
+لإعداد قاعدة البيانات للمرة الأولى، يمكنك تنفيذ سكريبت الـ SQL الموجود في مجلد \`supabase/migrations/\` من خلال لوحة تحكم Supabase الخاصة بك لإنشاء الجداول وإعدادات الحماية (RLS).
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project to GitHub Pages?
-
-This repository is configured to auto-deploy to GitHub Pages using GitHub Actions.
-
-1. Push your code to the `main` branch.
-2. In GitHub, open **Settings → Pages**.
-3. Set **Source** to **GitHub Actions**.
-4. Wait for the `Deploy to GitHub Pages` workflow to finish.
-
-Notes:
-
-- The workflow publishes the Vite `dist/` output.
-- A `404.html` fallback is generated for React Router SPA routes.
-- The Vite base path is set automatically from your repository name.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+*تم تطوير وتحديث هذا النظام ليتناسب مع أحدث معايير الويب لضمان تجربة مستخدم ممتازة وسهولة في الإدارة.*
