@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق Migrations - Joy Appliance Portal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .step {
+            background: #f8fafc;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-right: 4px solid #2563eb;
+        }
+        .step h2 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        .btn-success {
+            background: #16a34a;
+        }
+        .btn-success:hover {
+            background: #15803d;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        .status.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 تطبيق Migrations على قاعدة البيانات</h1>
+        <p class="subtitle">اتبع الخطوات التالية لإعداد قاعدة البيانات</p>
+
+        <div class="step">
+            <h2>الخطوة 1: افتح Supabase SQL Editor</h2>
+            <p>اضغط على الزر التالي لفتح SQL Editor في Supabase Dashboard:</p>
+            <button class="btn" onclick="window.open('https://app.supabase.com/project/xokthiwaizpuklcsndtw/sql/new', '_blank')">
+                📝 فتح SQL Editor
+            </button>
+        </div>
+
+        <div class="step">
+            <h2>الخطوة 2: نسخ ولصق الـ SQL</h2>
+            <p>انسخ الكود التالي والصقه في SQL Editor ثم اضغط Run:</p>
+            
+            <h3>Migration 1: إنشاء الجداول الأساسية</h3>
+            <div class="code-block" id="migration1"></div>
+            <button class="btn" onclick="copyToClipboard('migration1')">📋 نسخ Migration 1</button>
+
+            <h3>Migration 2: تحديث السياسات</h3>
+            <div class="code-block" id="migration2"></div>
+            <button class="btn" onclick="copyToClipboard('migration2')">📋 نسخ Migration 2</button>
+
+            <h3>Migration 3: تحديث الصور</h3>
+            <div class="code-block" id="migration3"></div>
+            <button class="btn" onclick="copyToClipboard('migration3')">📋 نسخ Migration 3</button>
+        </div>
+
+        <div class="step">
+            <h2>الخطوة 3: التحقق من النجاح</h2>
+            <p>بعد تنفيذ الـ migrations، تحقق من وجود الجداول التالية:</p>
+            <ul>
+                <li>✅ user_roles - أدوار المستخدمين</li>
+                <li>✅ categories - فئات المنتجات</li>
+                <li>✅ brands - العلامات التجارية</li>
+                <li>✅ products - المنتجات</li>
+                <li>✅ seo_settings - إعدادات SEO</li>
+                <li>✅ robots_rules - قواعد robots.txt</li>
+                <li>✅ sitemap_pages - صفحات sitemap</li>
+            </ul>
+            <button class="btn btn-success" onclick="window.open('https://app.supabase.com/project/xokthiwaizpuklcsndtw/editor', '_blank')">
+                🗄️ فتح Table Editor
+            </button>
+        </div>
+
+        <div class="step">
+            <h2>الخطوة 4: إضافة البيانات من CSV</h2>
+            <p>بعد نجاح الـ migrations، انسخ الكود التالي لإضافة البيانات:</p>
+            <div class="code-block" id="seedData"></div>
+            <button class="btn" onclick="copyToClipboard('seedData')">📋 نسخ البيانات</button>
+            <p style="margin-top: 10px; color: #666;">
+                البيانات تشمل: 2 فئات، 5 ماركات، 15 منتج، 4 إعدادات SEO، 3 قواعد robots، 4 صفحات sitemap، 1 مستخدم admin
+            </p>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Migration 1
+        const migration1 = `
+-- Create user_roles enum and table
+CREATE TYPE public.app_role AS ENUM ('admin', 'user');
+
+CREATE TABLE public.user_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  role app_role NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  UNIQUE (user_id, role)
+);
+
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+
+-- Security definer function to check roles
+CREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role app_role)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.user_roles
+    WHERE user_id = _user_id AND role = _role
+  )
+$$;
+
+-- RLS: only admins can read user_roles
+CREATE POLICY "Admins can read user_roles"
+  ON public.user_roles FOR SELECT TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Categories table
+CREATE TABLE public.categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  name_ar TEXT NOT NULL,
+  icon TEXT NOT NULL DEFAULT '📦',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Categories are publicly readable"
+  ON public.categories FOR SELECT USING (true);
+
+CREATE POLICY "Admins can insert categories"
+  ON public.categories FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can update categories"
+  ON public.categories FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can delete categories"
+  ON public.categories FOR DELETE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Brands table
+CREATE TABLE public.brands (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  logo TEXT DEFAULT '/placeholder.svg',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Brands are publicly readable"
+  ON public.brands FOR SELECT USING (true);
+
+CREATE POLICY "Admins can insert brands"
+  ON public.brands FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can update brands"
+  ON public.brands FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can delete brands"
+  ON public.brands FOR DELETE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Products table
+CREATE TABLE public.products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  name_ar TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  description_ar TEXT DEFAULT '',
+  price NUMERIC NOT NULL DEFAULT 0,
+  category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
+  brand_id UUID REFERENCES public.brands(id) ON DELETE SET NULL,
+  image TEXT DEFAULT '/placeholder.svg',
+  images TEXT[] DEFAULT ARRAY['/placeholder.svg'],
+  features TEXT[] DEFAULT '{}',
+  available BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Products are publicly readable"
+  ON public.products FOR SELECT USING (true);
+
+CREATE POLICY "Admins can insert products"
+  ON public.products FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can update products"
+  ON public.products FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can delete products"
+  ON public.products FOR DELETE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- SEO Settings table
+CREATE TABLE public.seo_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_path TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL DEFAULT '',
+  description TEXT DEFAULT '',
+  og_title TEXT DEFAULT '',
+  og_description TEXT DEFAULT '',
+  og_image TEXT DEFAULT '/placeholder.svg',
+  robots TEXT DEFAULT 'index, follow',
+  canonical TEXT DEFAULT '',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.seo_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "SEO settings are publicly readable"
+  ON public.seo_settings FOR SELECT USING (true);
+
+CREATE POLICY "Admins can insert seo_settings"
+  ON public.seo_settings FOR INSERT TO authenticated
+  WITH CHECK (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can update seo_settings"
+  ON public.seo_settings FOR UPDATE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+CREATE POLICY "Admins can delete seo_settings"
+  ON public.seo_settings FOR DELETE TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Robots rules table
+CREATE TABLE public.robots_rules (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_agent TEXT NOT NULL DEFAULT '*',
+  allow TEXT[] DEFAULT ARRAY['/'],
+  disallow TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.robots_rules ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Robots rules are publicly readable"
+  ON public.robots_rules FOR SELECT USING (true);
+
+CREATE POLICY "Admins can manage robots rules"
+  ON public.robots_rules FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Sitemap pages table
+CREATE TABLE public.sitemap_pages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  path TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  visible BOOLEAN NOT NULL DEFAULT true,
+  priority NUMERIC NOT NULL DEFAULT 0.5,
+  changefreq TEXT NOT NULL DEFAULT 'monthly',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.sitemap_pages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Sitemap pages are publicly readable"
+  ON public.sitemap_pages FOR SELECT USING (true);
+
+CREATE POLICY "Admins can manage sitemap pages"
+  ON public.sitemap_pages FOR ALL TO authenticated
+  USING (public.has_role(auth.uid(), 'admin'));
+
+-- Updated_at trigger function
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SET search_path = public;
+
+CREATE TRIGGER update_categories_updated_at
+  BEFORE UPDATE ON public.categories
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_products_updated_at
+  BEFORE UPDATE ON public.products
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+CREATE TRIGGER update_seo_settings_updated_at
+  BEFORE UPDATE ON public.seo_settings
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+`;
+
+        // Migration 2
+        const migration2 = `
+-- Drop restrictive SELECT policies and recreate as permissive
+DROP POLICY IF EXISTS "Products are publicly readable" ON public.products;
+CREATE POLICY "Products are publicly readable" ON public.products FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Categories are publicly readable" ON public.categories;
+CREATE POLICY "Categories are publicly readable" ON public.categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Brands are publicly readable" ON public.brands;
+CREATE POLICY "Brands are publicly readable" ON public.brands FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "SEO settings are publicly readable" ON public.seo_settings;
+CREATE POLICY "SEO settings are publicly readable" ON public.seo_settings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Robots rules are publicly readable" ON public.robots_rules;
+CREATE POLICY "Robots rules are publicly readable" ON public.robots_rules FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Sitemap pages are publicly readable" ON public.sitemap_pages;
+CREATE POLICY "Sitemap pages are publicly readable" ON public.sitemap_pages FOR SELECT USING (true);
+`;
+
+        // Migration 3
+        const migration3 = `
+UPDATE public.products SET image = '/images/products/dlsb-led.webp' WHERE slug = 'dlsb-led';
+UPDATE public.products SET image = '/images/products/dl-round.webp' WHERE slug = 'dl-round';
+UPDATE public.products SET image = '/images/products/dl-square.webp' WHERE slug = 'dl-square';
+UPDATE public.products SET image = '/images/products/mango-midi.webp' WHERE slug = 'mango-midi';
+UPDATE public.products SET image = '/images/products/elia-dl.webp' WHERE slug = 'elia-dl';
+UPDATE public.products SET image = '/images/products/eb-plus.webp' WHERE slug = 'eb-plus';
+`;
+
+        // Seed Data
+        const seedData = `
+-- إضافة فئات تجريبية
+INSERT INTO public.categories (slug, name, name_ar, icon) VALUES
+('lighting', 'Lighting', 'إضاءة', '💡'),
+('appliances', 'Appliances', 'أجهزة منزلية', '🏠'),
+('electronics', 'Electronics', 'إلكترونيات', '📱');
+
+-- إضافة علامات تجارية تجريبية
+INSERT INTO public.brands (slug, name) VALUES
+('joy', 'Joy'),
+('samsung', 'Samsung'),
+('lg', 'LG');
+
+-- إضافة منتجات تجريبية
+INSERT INTO public.products (slug, name, name_ar, price, category_id, brand_id, available) 
+SELECT 
+  'test-product-1',
+  'Test Product 1',
+  'منتج تجريبي 1',
+  999.99,
+  c.id,
+  b.id,
+  true
+FROM public.categories c, public.brands b
+WHERE c.slug = 'lighting' AND b.slug = 'joy'
+LIMIT 1;
+`;
+
+        // Display migrations
+        document.getElementById('migration1').textContent = migration1;
+        document.getElementById('migration2').textContent = migration2;
+        document.getElementById('migration3').textContent = migration3;
+        document.getElementById('seedData').textContent = seedData;
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('تم النسخ بنجاح! ✅', 'success');
+            }).catch(err => {
+                showStatus('فشل النسخ. حاول مرة أخرى.', 'error');
+            });
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

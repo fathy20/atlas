@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ContentEditable Editor Styles */
+[contenteditable]:empty:before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+}
+
+[contenteditable] h2 {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 0.5em 0;
+}
+
+[contenteditable] ul,
+[contenteditable] ol {
+  padding-inline-start: 2em;
+  margin: 0.5em 0;
+}
+
+[contenteditable] strong {
+  font-weight: bold;
+}
+
+[contenteditable] em {
+  font-style: italic;
+}
+
+[contenteditable] table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+[contenteditable] table td,
+[contenteditable] table th {
+  border: 1px solid hsl(var(--border));
+  padding: 8px;
+}
+
+[contenteditable] table th {
+  background-color: hsl(var(--muted));
+  font-weight: bold;
+}
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 215 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 30% 12%;
+
+    --primary: 204 100% 36%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 30% 94%;
+    --secondary-foreground: 204 100% 36%;
+
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 15% 46%;
+
+    --accent: 210 30% 94%;
+    --accent-foreground: 204 100% 36%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 25% 88%;
+    --input: 214 25% 88%;
+    --ring: 204 100% 36%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 204 100% 36%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 204 100% 36%;
+    --sidebar-accent: 204 100% 30%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 204 100% 30%;
+    --sidebar-ring: 204 100% 45%;
+  }
+
+  .dark {
+    --background: 215 30% 8%;
+    --foreground: 210 20% 95%;
+
+    --card: 215 30% 12%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 215 30% 12%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 204 100% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 25% 18%;
+    --secondary-foreground: 210 20% 95%;
+
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 15% 60%;
+
+    --accent: 215 25% 18%;
+    --accent-foreground: 210 20% 95%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 25% 18%;
+    --input: 215 25% 18%;
+    --ring: 204 100% 45%;
+
+    --sidebar-background: 204 100% 36%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 204 100% 36%;
+    --sidebar-accent: 204 100% 30%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 204 100% 30%;
+    --sidebar-ring: 204 100% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Cairo', 'Segoe UI', sans-serif;
+  }
+}
+
+/* RTL Support for SEO Dashboard */
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl input,
+.rtl textarea {
+  text-align: right;
+  direction: rtl;
+}
+
+.rtl label {
+  text-align: right;
+}
+
+/* Don't reverse flex for card headers - we want manual control */
+.rtl .flex:not(.card-header-flex) {
+  flex-direction: row-reverse;
+}
+
+.rtl .grid {
+  direction: rtl;
+}
+
+/* Ensure tabs are properly aligned for RTL */
+.rtl [role="tablist"] {
+  direction: rtl;
+}
+
+.rtl [role="tab"] {
+  text-align: right;
+}
+
+/* Card content alignment */
+.rtl .card-content {
+  text-align: right;
+}
+
+/* Button alignment in RTL */
+.rtl .justify-between:not(.card-header-flex) {
+  flex-direction: row-reverse;
+}
