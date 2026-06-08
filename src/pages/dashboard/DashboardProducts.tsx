@@ -18,7 +18,7 @@ import { resolveMediaUrl } from "@/lib/media";
 import RichTextEditor from "@/components/RichTextEditor";
 
 const DashboardProducts = () => {
-  const { products, categories, brands, addProduct, updateProduct, deleteProduct } = useData();
+  const { products, categories, brands, loading, addProduct, updateProduct, deleteProduct } = useData();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<DbProduct | null>(null);
@@ -136,7 +136,20 @@ const DashboardProducts = () => {
       return;
     }
 
-    const slug = form.slug || form.name.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now();
+    // Generate SEO-friendly slug
+    const generateSlug = (text: string): string => {
+      return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .replace(/\s+/g, '-')      // Replace spaces with hyphens
+        .replace(/-+/g, '-')       // Replace multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, '');  // Remove leading/trailing hyphens
+    };
+
+    const slug = form.slug 
+      ? generateSlug(form.slug) 
+      : generateSlug(form.name) + "-" + Date.now();
     const productData: any = {
       slug,
       name: form.name, name_ar: form.name_ar,
@@ -251,7 +264,13 @@ const DashboardProducts = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground">إدارة المنتجات</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            إجمالي المنتجات: {products.length} | معروض: {filteredProducts.length}
+            إجمالي المنتجات: {products.length}+ | معروض: {filteredProducts.length}
+            {products.length >= 20 && products.length < 84 && (
+              <span className="inline-flex items-center gap-1 mr-2 text-primary">
+                <span className="inline-block animate-spin rounded-full h-3 w-3 border-b border-primary"></span>
+                جاري تحميل المزيد...
+              </span>
+            )}
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) resetForm(); }}>
@@ -734,9 +753,18 @@ const DashboardProducts = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedProducts.length === 0 ? (
+            {loading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-16">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    <p className="text-muted-foreground">جاري تحميل المنتجات...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : paginatedProducts.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   لا توجد منتجات
                 </TableCell>
               </TableRow>

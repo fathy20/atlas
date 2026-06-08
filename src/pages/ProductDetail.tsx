@@ -7,12 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { companyInfo } from "@/data/products";
 import { resolveMediaUrl } from "@/lib/media";
+import { findProductBySlug } from "@/lib/slug";
 import { Helmet } from "react-helmet";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { products } = useData();
-  const product = products.find((p) => p.slug === id);
+  const product = findProductBySlug(products, id || '');
 
   if (!product) {
     return (
@@ -110,7 +111,7 @@ const ProductDetail = () => {
               <Button asChild size="lg" className="w-full gap-2">
                 <a href={`https://wa.me/${companyInfo.whatsapp}?text=مرحبا، أريد الاستفسار عن ${product.name_ar}`} target="_blank" rel="noopener noreferrer">
                   <MessageCircle size={20} />
-                  اطلب عبر واتساب
+                  اطلب عرض سعر عبر واتساب
                 </a>
               </Button>
             </div>

@@ -3,14 +3,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { DbProduct } from "@/contexts/DataContext";
 import { resolveMediaUrl } from "@/lib/media";
+import { generateSeoSlug } from "@/lib/slug";
 
 interface ProductCardProps {
   product: DbProduct;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const seoSlug = generateSeoSlug(product);
+  
   return (
-    <Link to={`/products/${product.slug}`}>
+    <Link to={`/products/${seoSlug}`}>
       <Card className="overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 h-full group">
         <div className="aspect-square bg-muted relative overflow-hidden">
           <img

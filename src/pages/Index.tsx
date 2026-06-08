@@ -6,6 +6,7 @@ import BannerSection from "@/components/BannerSection";
 import StatsSection from "@/components/StatsSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import ContactSection from "@/components/ContactSection";
+import CompanyTimeline from "@/components/CompanyTimeline";
 import SEOHead from "@/components/SEOHead";
 import WhatsAppFloat from "@/components/WhatsAppFloat";
 
@@ -19,6 +20,7 @@ const Index = () => {
         <BrandsShowcase />
         <BannerSection />
         <StatsSection />
+        <CompanyTimeline />
         <FeaturesSection />
         <ContactSection />
       </main>

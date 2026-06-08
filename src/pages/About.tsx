@@ -4,38 +4,17 @@ import SEOHead from "@/components/SEOHead";
 import CompanyTimeline from "@/components/CompanyTimeline";
 import { companyInfo } from "@/data/products";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const About = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <SEOHead />
       <Navbar />
       <main className="min-h-screen bg-background">
-        {/* Hero */}
-        <section className="bg-primary text-primary-foreground py-16 md:py-24">
-          <div className="container mx-auto px-4 text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-4xl font-bold mb-4"
-            >
-              مسيرة عراقة.. ورؤية نحو المستقبل
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="text-primary-foreground/80 max-w-2xl mx-auto"
-            >
-              {companyInfo.fullName}
-            </motion.p>
-          </div>
-        </section>
-
-        {/* Company Timeline */}
-        <CompanyTimeline />
-
         {/* Content - Vision & Mission */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
@@ -123,7 +102,7 @@ const About = () => {
         </section>
 
         {/* Stats */}
-        <section className="py-16 bg-primary text-primary-foreground">
+        <section className="py-12 bg-[#0066b2] text-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {companyInfo.stats.map((stat, i) => (
@@ -136,11 +115,36 @@ const About = () => {
                   className="text-center"
                 >
                   <p className="text-3xl md:text-4xl font-bold mb-1">{stat.value}</p>
-                  <p className="text-sm text-primary-foreground/70">{stat.label}</p>
+                  <p className="text-sm text-white/80">{stat.label}</p>
                 </motion.div>
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Company Timeline */}
+        <section className="py-16 bg-background">
+          <div className="container mx-auto px-4 text-center mb-12">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-3xl md:text-4xl font-bold text-foreground mb-4"
+            >
+              رحلة عراقة منذ 1988
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="text-muted-foreground max-w-2xl mx-auto"
+            >
+              {companyInfo.fullName}
+            </motion.p>
+          </div>
+          <CompanyTimeline />
         </section>
       </main>
       <Footer />

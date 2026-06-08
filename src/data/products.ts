@@ -274,9 +274,9 @@ export const companyInfo = {
   address: "طرابلس، الكريمية",
   addressEn: "Tripoli, Al-Karimia",
   social: {
-    facebook: "https://facebook.com/atlas",
-    instagram: "https://instagram.com/atlas",
-    tiktok: "https://www.tiktok.com/@atlasly5?_r=1&_t=ZS-954cOLNaCLI",
+    facebook: "https://www.facebook.com/share/192DQDVxb9/?mibextid=wwXIfr",
+    instagram: "https://www.instagram.com/atlas_ly2026?igsh=MTB1c2RyeGl2ampvcQ==",
+    tiktok: "https://www.tiktok.com/@atlasly5?_r=1&_t=ZS-96rxrAXGfkl",
   },
   stats: [
     { value: "+35", label: "عاماً من الخبرة" },

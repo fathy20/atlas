@@ -79,7 +79,7 @@ const CompanyTimeline = () => {
         {/* Timeline */}
         <div className="relative max-w-4xl mx-auto">
           {/* Center Line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary to-primary/20 -translate-x-1/2 hidden md:block" />
+          <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary to-primary/20 hidden md:block" style={{ transform: 'translateX(-50%)' }} />
           {/* Mobile Line */}
           <div className="absolute right-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary to-primary/20 md:hidden" />
 
@@ -97,10 +97,10 @@ const CompanyTimeline = () => {
                   className="relative"
                 >
                   {/* Desktop Layout */}
-                  <div className="hidden md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6 items-center">
+                  <div className="hidden md:grid md:grid-cols-[1fr_auto_1fr] md:gap-6 items-start">
                     {/* Left content or spacer */}
                     {isLeft ? (
-                      <div className="text-left">
+                      <div className="text-left pt-2">
                         <TimelineCard event={event} align="left" />
                       </div>
                     ) : (
@@ -108,7 +108,7 @@ const CompanyTimeline = () => {
                     )}
 
                     {/* Center dot */}
-                    <div className="relative z-10">
+                    <div className="relative z-10 flex items-start justify-center">
                       <motion.div
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
@@ -122,7 +122,7 @@ const CompanyTimeline = () => {
 
                     {/* Right content or spacer */}
                     {!isLeft ? (
-                      <div className="text-right">
+                      <div className="text-right pt-2">
                         <TimelineCard event={event} align="right" />
                       </div>
                     ) : (

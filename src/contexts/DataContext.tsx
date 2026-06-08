@@ -50,17 +50,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
-    const [pRes, cRes, bRes, sRes, rRes, smRes] = await Promise.all([
-      supabase.from("products").select("*").order("created_at", { ascending: false }),
+    // Fetch only essential data initially - products will be fetched on-demand
+    const [cRes, bRes, sRes, rRes, smRes] = await Promise.all([
       supabase.from("categories").select("*").order("created_at"),
       supabase.from("brands").select("*").order("created_at"),
       supabase.from("seo_settings").select("*").order("page_path"),
       supabase.from("robots_rules").select("*"),
       supabase.from("sitemap_pages").select("*").order("priority", { ascending: false }),
     ]);
-    console.log("Products fetch:", { data: pRes.data?.length, error: pRes.error });
-    console.log("Categories fetch:", { data: cRes.data?.length, error: cRes.error });
-    console.log("Brands fetch:", { data: bRes.data?.length, error: bRes.error });
+    
+    // Fetch only first 20 products for initial load
+    const pRes = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20);
+    
     if (pRes.data) setProducts(pRes.data);
     if (cRes.data) setCategories(cRes.data);
     if (bRes.data) setBrands(bRes.data);
@@ -68,6 +73,18 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (rRes.data) setRobotsRules(rRes.data);
     if (smRes.data) setSitemapPages(smRes.data);
     setLoading(false);
+    
+    // Fetch remaining products in background
+    supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .range(20, 1000)
+      .then(({ data }) => {
+        if (data) {
+          setProducts(prev => [...prev, ...data]);
+        }
+      });
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 
 const Products = () => {
-  const { products, categories } = useData();
+  const { products, categories, loading } = useData();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -115,7 +115,12 @@ const Products = () => {
             </aside>
 
             <div className="flex-1">
-              {filtered.length === 0 ? (
+              {loading ? (
+                <div className="text-center py-16">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  <p className="mt-4 text-muted-foreground">جاري تحميل المنتجات...</p>
+                </div>
+              ) : filtered.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground">
                   لا توجد منتجات مطابقة
                 </div>
