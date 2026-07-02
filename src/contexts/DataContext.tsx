@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -26,17 +26,16 @@ interface DataContextType {
   addCategory: (category: Omit<DbCategory, "id" | "created_at" | "updated_at">) => Promise<void>;
   updateCategory: (id: string, updates: Partial<DbCategory>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
-  // SEO
   updateSeoSetting: (id: string, updates: Partial<DbSeoSetting>) => Promise<void>;
   // Refresh
   refresh: () => Promise<void>;
 }
 
-const DataContext = createContext<DataContextType | null>(null);
+const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const useData = () => {
   const ctx = useContext(DataContext);
-  if (!ctx) throw new Error("useData must be used within DataProvider");
+  if (!ctx) throw new Error("useData must be used within a DataProvider");
   return ctx;
 };
 
@@ -48,17 +47,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [robotsRules, setRobotsRules] = useState<DbRobotsRule[]>([]);
   const [sitemapPages, setSitemapPages] = useState<DbSitemapPage[]>([]);
   const [loading, setLoading] = useState(true);
+  const currentFetchIdRef = useRef(0);
 
   const fetchAll = useCallback(async () => {
-    // Fetch all data in parallel for maximum performance
+    const myFetchId = ++currentFetchIdRef.current;
+    
+    // 1. Fetch initial essential data + first 36 products (Pages 1, 2, 3) for super fast load
     const [pRes, cRes, bRes, sRes, rRes, smRes] = await Promise.all([
-      supabase.from("products").select("*").order("created_at", { ascending: false }),
+      supabase.from("products").select("*").order("created_at", { ascending: false }).range(0, 35),
       supabase.from("categories").select("*").order("created_at"),
       supabase.from("brands").select("*").order("created_at"),
       supabase.from("seo_settings").select("*").order("page_path"),
       supabase.from("robots_rules").select("*"),
       supabase.from("sitemap_pages").select("*").order("priority", { ascending: false }),
     ]);
+
+    if (currentFetchIdRef.current !== myFetchId) return;
 
     if (pRes.data) setProducts(pRes.data);
     if (cRes.data) setCategories(cRes.data);
@@ -67,6 +71,31 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (rRes.data) setRobotsRules(rRes.data);
     if (smRes.data) setSitemapPages(smRes.data);
     setLoading(false);
+
+    // 2. Progressive background streaming for remaining products (in chunks of 36)
+    // Avoids heavy single requests / statement timeouts while ensuring all products load
+    let from = 36;
+    const step = 36;
+    while (true) {
+      if (currentFetchIdRef.current !== myFetchId) break;
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .range(from, from + step - 1);
+
+      if (currentFetchIdRef.current !== myFetchId || error || !data || data.length === 0) break;
+
+      setProducts(prev => {
+        const existingIds = new Set(prev.map(p => p.id));
+        const newItems = data.filter(p => !existingIds.has(p.id));
+        if (newItems.length === 0) return prev;
+        return [...prev, ...newItems];
+      });
+
+      if (data.length < step) break;
+      from += step;
+    }
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
