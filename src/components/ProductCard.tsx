@@ -32,8 +32,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <CardContent className="p-4">
           <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name_ar}</h3>
           <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{product.description_ar}</p>
-          <div className="flex items-center justify-between">
-            <span className="font-bold text-primary">{product.price} د.ل</span>
+          <div className="flex items-center justify-end">
             <span className="text-xs text-muted-foreground">{product.name}</span>
           </div>
         </CardContent>

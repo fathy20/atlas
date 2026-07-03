@@ -113,8 +113,6 @@ const ProductDetail = () => {
         <meta property="og:description" content={metaDescription || ''} />
         <meta property="og:image" content={resolveMediaUrl(product.image)} />
         <meta property="og:type" content="product" />
-        <meta property="product:price:amount" content={product.price.toString()} />
-        <meta property="product:price:currency" content="LYD" />
       </Helmet>
       <Navbar />
       <main className="min-h-screen bg-background">
@@ -155,8 +153,7 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              <p className="text-sm text-muted-foreground mb-4">{product.name}</p>
-              <p className="text-2xl font-bold text-primary mb-6">{product.price} د.ل</p>
+              <p className="text-sm text-muted-foreground mb-6">{product.name}</p>
 
               <div className="mb-6">
                 <div
