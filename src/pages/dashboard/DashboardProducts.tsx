@@ -363,18 +363,6 @@ const DashboardProducts = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
-                  <div>
-                    <Label className="text-sm">السعر (د.ل) *</Label>
-                    <Input 
-                      type="number" 
-                      value={form.price} 
-                      onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-                      placeholder="0.00"
-                      step="0.01"
-                      className="mt-1"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -748,14 +736,13 @@ const DashboardProducts = () => {
               <TableHead className="min-w-[130px] text-right">رمز المادة (SKU)</TableHead>
               <TableHead className="min-w-[120px] text-right">الفئة</TableHead>
               <TableHead className="min-w-[120px] text-right">الماركة</TableHead>
-              <TableHead className="min-w-[100px] text-right">السعر</TableHead>
               <TableHead className="min-w-[100px] text-right">الحالة</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-16">
+                <TableCell colSpan={7} className="text-center py-16">
                   <div className="flex flex-col items-center gap-4">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                     <p className="text-muted-foreground">جاري تحميل المنتجات...</p>
@@ -764,7 +751,7 @@ const DashboardProducts = () => {
               </TableRow>
             ) : paginatedProducts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   لا توجد منتجات
                 </TableCell>
               </TableRow>
@@ -831,7 +818,6 @@ const DashboardProducts = () => {
                   <TableCell className="text-sm">
                     {brands.find(b => b.id === p.brand_id)?.name || "-"}
                   </TableCell>
-                  <TableCell className="text-sm font-medium">{p.price} د.ل</TableCell>
                   <TableCell>
                     <Badge variant={p.available ? "default" : "secondary"}>
                       {p.available ? "متاح" : "غير متاح"}
