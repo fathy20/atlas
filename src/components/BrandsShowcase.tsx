@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useData } from "@/contexts/DataContext";
 import { motion } from "framer-motion";
 import { resolveMediaUrl } from "@/lib/media";
+import logoAtlas from "@/assets/logo-atlas.png";
 
 type BrandLogoProps = {
   name: string;
@@ -19,12 +20,18 @@ const BrandLogo = ({ name, logo }: BrandLogoProps) => {
     return <span className="text-lg font-bold text-muted-foreground hover:text-foreground transition-colors">{name}</span>;
   }
 
+  const isAtlas = name.toLowerCase().includes("atlas") || name.includes("أطلس");
+
   return (
     <img
       src={logoSrc}
       alt={name}
       onError={() => setLogoSrc(null)}
-      className="h-10 md:h-12 w-auto object-contain"
+      className={`w-auto object-contain transition-all duration-300 ${
+        isAtlas 
+          ? "h-14 md:h-20 lg:h-22" 
+          : "h-10 md:h-14 lg:h-16"
+      }`}
     />
   );
 };
@@ -50,15 +57,15 @@ const BrandsShowcase = () => {
         >
           موزع معتمد
         </motion.h2>
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+        <div className="flex flex-wrap items-center justify-center gap-10 md:gap-14 lg:gap-16">
           {brands.map((brand, i) => (
             <motion.div
               key={brand.id}
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
-              className="flex items-center justify-center grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300"
+              transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
+              className="flex items-center justify-center grayscale hover:grayscale-0 opacity-70 hover:opacity-100 transition-all duration-300 shrink-0"
             >
               <BrandLogo name={brand.name} logo={brand.logo} />
             </motion.div>

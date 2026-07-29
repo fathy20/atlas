@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useData } from "@/contexts/DataContext";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import { companyInfo } from "@/data/products";
 import { resolveMediaUrl } from "@/lib/media";
+import { getColorHex } from "@/lib/colors";
 import { findProductBySlug } from "@/lib/slug";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,9 @@ const ProductDetail = () => {
   const [fetchedProduct, setFetchedProduct] = useState<DbProduct | null>(null);
   const [fetchLoading, setFetchLoading] = useState(false);
   const [fetchDone, setFetchDone] = useState(false);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   // Try to find in cached products first
   const cachedProduct = findProductBySlug(products, id || '');
@@ -66,6 +70,49 @@ const ProductDetail = () => {
   const product = cachedProduct || fetchedProduct;
   const isLoading = contextLoading || fetchLoading;
 
+  // All product images
+  const allImages = useMemo(() => {
+    if (!product) return [];
+    const rawList: string[] = [];
+    if (product.image) rawList.push(product.image);
+    if (product.images && Array.isArray(product.images)) {
+      product.images.forEach((img) => {
+        if (img) rawList.push(img);
+      });
+    }
+
+    // Filter out duplicates and placeholder images if real images are present
+    const validImages = rawList.filter(
+      (img, index, self) =>
+        self.indexOf(img) === index && img !== "/placeholder.svg" && img.trim() !== ""
+    );
+
+    if (validImages.length > 0) {
+      return validImages;
+    }
+
+    return ["/placeholder.svg"];
+  }, [product]);
+
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [product?.id, allImages.length]);
+
+  // Product colors list
+  const colorsList: string[] = useMemo(() => {
+    if (!product) return [];
+    if ((product as any)?.colors && Array.isArray((product as any).colors)) {
+      return (product as any).colors.filter(Boolean);
+    }
+    return [];
+  }, [product]);
+
+  useEffect(() => {
+    if (colorsList.length > 0 && !selectedColor) {
+      setSelectedColor(colorsList[0]);
+    }
+  }, [colorsList, selectedColor]);
+
   // Show spinner while loading
   if (isLoading && !product) {
     return (
@@ -111,7 +158,7 @@ const ProductDetail = () => {
         {metaKeywords && <meta name="keywords" content={metaKeywords} />}
         <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDescription || ''} />
-        <meta property="og:image" content={resolveMediaUrl(product.image)} />
+        <meta property="og:image" content={resolveMediaUrl(allImages[selectedImageIndex] || product.image)} />
         <meta property="og:type" content="product" />
       </Helmet>
       <Navbar />
@@ -126,16 +173,44 @@ const ProductDetail = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-            <div className="bg-muted rounded-lg aspect-square flex items-center justify-center">
-              <img
-                src={resolveMediaUrl(product.image)}
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = resolveMediaUrl();
-                }}
-                alt={product.name_ar}
-                className="w-full h-full object-cover rounded-lg"
-              />
+            {/* Image Gallery */}
+            <div className="space-y-4">
+              <div className="bg-card border border-border/80 rounded-2xl aspect-square flex items-center justify-center p-4 shadow-sm overflow-hidden relative group">
+                <img
+                  src={resolveMediaUrl(allImages[selectedImageIndex] || product.image)}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = resolveMediaUrl();
+                  }}
+                  alt={product.name_ar}
+                  className="w-full h-full object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+
+              {/* Thumbnails Gallery */}
+              {allImages.length > 1 && (
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 pt-1 scrollbar-thin">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setSelectedImageIndex(idx)}
+                      onMouseEnter={() => setSelectedImageIndex(idx)}
+                      className={`relative w-20 h-20 rounded-xl border p-1.5 bg-card shrink-0 transition-all duration-200 ${
+                        selectedImageIndex === idx
+                          ? "border-primary ring-2 ring-primary/40 shadow-md scale-105"
+                          : "border-border/80 opacity-70 hover:opacity-100 hover:border-primary/50"
+                      }`}
+                    >
+                      <img
+                        src={resolveMediaUrl(img)}
+                        alt={`${product.name_ar} ${idx + 1}`}
+                        className="w-full h-full object-contain rounded-lg"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
@@ -155,6 +230,46 @@ const ProductDetail = () => {
 
               <p className="text-sm text-muted-foreground mb-6">{product.name}</p>
 
+              {/* Available Colors Filter Section */}
+              {colorsList.length > 0 && (
+                <div className="mb-6 bg-card border border-border/80 rounded-2xl p-4 shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-bold text-foreground text-sm flex items-center gap-1.5">
+                      الخيارات والألوان المتوفرة:
+                    </span>
+                    {selectedColor && (
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                        {selectedColor}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {colorsList.map((color) => {
+                      const hex = getColorHex(color);
+                      const isSelected = selectedColor === color;
+                      return (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setSelectedColor(color)}
+                          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-medium transition-all duration-200 ${
+                            isSelected
+                              ? "border-primary bg-primary/10 text-primary ring-2 ring-primary/30 font-bold shadow-sm"
+                              : "border-border bg-muted/40 text-foreground hover:border-primary/40 hover:bg-muted/80"
+                          }`}
+                        >
+                          <span
+                            className="w-4 h-4 rounded-full border border-black/20 shadow-inner shrink-0"
+                            style={{ backgroundColor: hex }}
+                          />
+                          <span>{color}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="mb-6">
                 <div
                   className="text-muted-foreground leading-relaxed mb-3"
@@ -162,18 +277,20 @@ const ProductDetail = () => {
                 />
               </div>
 
-              <div className="mb-8">
-                <h3 className="font-semibold text-foreground mb-3">المميزات</h3>
-                <div className="flex flex-wrap gap-2">
-                  {(product.features || []).map((f, i) => (
-                    <Badge key={i} variant="secondary">{f}</Badge>
-                  ))}
+              {product.features && product.features.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="font-semibold text-foreground mb-3">المميزات</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {product.features.map((f, i) => (
+                      <Badge key={i} variant="secondary">{f}</Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <Button asChild size="lg" className="w-full gap-2">
                 <a
-                  href={`https://wa.me/${companyInfo.whatsapp}?text=مرحبا، أريد الاستفسار عن ${product.name_ar}`}
+                  href={`https://wa.me/${companyInfo.whatsapp}?text=مرحبا، أريد الاستفسار عن ${product.name_ar}${selectedColor ? ` (اللون: ${selectedColor})` : ''}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -191,3 +308,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+

@@ -26,6 +26,10 @@ interface DataContextType {
   addCategory: (category: Omit<DbCategory, "id" | "created_at" | "updated_at">) => Promise<void>;
   updateCategory: (id: string, updates: Partial<DbCategory>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
+  // Brands
+  addBrand: (brand: Omit<DbBrand, "id" | "created_at">) => Promise<void>;
+  updateBrand: (id: string, updates: Partial<DbBrand>) => Promise<void>;
+  deleteBrand: (id: string) => Promise<void>;
   updateSeoSetting: (id: string, updates: Partial<DbSeoSetting>) => Promise<void>;
   // Refresh
   refresh: () => Promise<void>;
@@ -151,6 +155,24 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await fetchAll();
   }, [fetchAll]);
 
+  const addBrand = useCallback(async (brand: Omit<DbBrand, "id" | "created_at">) => {
+    const { error } = await supabase.from("brands").insert(brand);
+    if (error) throw error;
+    await fetchAll();
+  }, [fetchAll]);
+
+  const updateBrand = useCallback(async (id: string, updates: Partial<DbBrand>) => {
+    const { error } = await supabase.from("brands").update(updates).eq("id", id);
+    if (error) throw error;
+    await fetchAll();
+  }, [fetchAll]);
+
+  const deleteBrand = useCallback(async (id: string) => {
+    const { error } = await supabase.from("brands").delete().eq("id", id);
+    if (error) throw error;
+    await fetchAll();
+  }, [fetchAll]);
+
   const updateSeoSetting = useCallback(async (id: string, updates: Partial<DbSeoSetting>) => {
     await supabase.from("seo_settings").update(updates).eq("id", id);
     await fetchAll();
@@ -161,9 +183,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       products, categories, brands, seoSettings, robotsRules, sitemapPages, loading,
       addProduct, updateProduct, deleteProduct,
       addCategory, updateCategory, deleteCategory,
+      addBrand, updateBrand, deleteBrand,
       updateSeoSetting, refresh: fetchAll,
     }}>
       {children}
     </DataContext.Provider>
   );
 };
+

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Package, FolderOpen, Search, LogOut, Home, FileText } from "lucide-react";
+import { Package, FolderOpen, Award, Search, LogOut, Home, FileText } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 const menuItems = [
   { title: "المنتجات", url: "/dashboard/products", icon: Package },
   { title: "الفئات", url: "/dashboard/categories", icon: FolderOpen },
+  { title: "الماركات", url: "/dashboard/brands", icon: Award },
   { title: "إدارة SEO", url: "/dashboard/seo", icon: Search },
   { title: "إدارة البيانات", url: "/dashboard/content", icon: FileText },
 ];

@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, Search, Filter, Upload, X, ChevronLeft, ChevronRi
 import { useToast } from "@/hooks/use-toast";
 import type { DbProduct } from "@/contexts/DataContext";
 import { resolveMediaUrl } from "@/lib/media";
+import { getColorHex, PRESET_COLORS } from "@/lib/colors";
 import RichTextEditor from "@/components/RichTextEditor";
 
 const DashboardProducts = () => {
@@ -43,6 +44,7 @@ const DashboardProducts = () => {
     price: 0, category_id: "", brand_id: "", available: true, features: "", slug: "",
     sku: "",
     image: "", images: [] as string[],
+    colors: [] as string[],
     meta_title: "", meta_title_ar: "", meta_description: "", meta_description_ar: "",
     meta_keywords: "", meta_keywords_ar: "",
   });
@@ -52,6 +54,7 @@ const DashboardProducts = () => {
       name: "", name_ar: "", description_ar: "", 
       price: 0, category_id: "", brand_id: "", available: true, 
       features: "", slug: "", sku: "", image: "", images: [],
+      colors: [],
       meta_title: "", meta_title_ar: "", meta_description: "", meta_description_ar: "",
       meta_keywords: "", meta_keywords_ar: "",
     });
@@ -68,13 +71,14 @@ const DashboardProducts = () => {
       features: (p.features || []).join(", "), slug: p.slug,
       sku: p.sku || "",
       image: p.image || "", images: p.images || [],
+      colors: (p as any).colors || [],
       meta_title: (p as any).meta_title || "", meta_title_ar: (p as any).meta_title_ar || "",
       meta_description: (p as any).meta_description || "", meta_description_ar: (p as any).meta_description_ar || "",
       meta_keywords: (p as any).meta_keywords || "", meta_keywords_ar: (p as any).meta_keywords_ar || "",
     });
     setDialogOpen(true);
   };
-  
+
   // Filtered & Paginated Products
   const filteredProducts = useMemo(() => {
     const filtered = products.filter(p => {
@@ -150,13 +154,20 @@ const DashboardProducts = () => {
     const slug = form.slug 
       ? generateSlug(form.slug) 
       : generateSlug(form.name) + "-" + Date.now();
+    const validImages = form.images.filter(img => img && img !== "/placeholder.svg" && img.trim() !== "");
+    const primaryImage = (form.image && form.image !== "/placeholder.svg") 
+      ? form.image 
+      : (validImages[0] || "/placeholder.svg");
+    const finalImages = validImages.length > 0 ? validImages : [primaryImage];
+
     const productData: any = {
       slug,
       name: form.name, name_ar: form.name_ar,
       description: null, description_ar: form.description_ar,
       price: form.price, category_id: form.category_id || null, brand_id: form.brand_id || null,
-      image: form.image || "/placeholder.svg", 
-      images: form.images.length > 0 ? form.images : ["/placeholder.svg"],
+      image: primaryImage, 
+      images: finalImages,
+      colors: form.colors,
       features: form.features.split(",").map(f => f.trim()).filter(Boolean),
       available: form.available,
       sku: form.sku || null,
@@ -515,6 +526,99 @@ const DashboardProducts = () => {
                     className="mt-1"
                   />
                   <p className="text-xs text-muted-foreground mt-1">مثال: LED, موفر للطاقة, ضمان سنتين</p>
+                </div>
+
+                {/* Colors Picker */}
+                <div className="border border-border/80 rounded-xl p-3.5 bg-muted/20 space-y-2">
+                  <Label className="text-sm font-semibold text-foreground block">
+                    الألوان والخيارات المتوفرة لهذا المنتج
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    اضغط على الألوان المتاحة لتحديدها، أو أضف لوناً مخصصاً:
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {PRESET_COLORS.map((c) => {
+                      const isSelected = form.colors.includes(c);
+                      return (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setForm({ ...form, colors: form.colors.filter((x) => x !== c) });
+                            } else {
+                              setForm({ ...form, colors: [...form.colors, c] });
+                            }
+                          }}
+                          className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border text-xs transition-all ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
+                              : "bg-background text-foreground border-border hover:border-primary/50"
+                          }`}
+                        >
+                          <span
+                            className="w-3 h-3 rounded-full border border-black/20 shrink-0"
+                            style={{ backgroundColor: getColorHex(c) }}
+                          />
+                          {c}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Input
+                      id="custom-color-input"
+                      placeholder="أدخل لون جديد (مثال: نحاسي, أوف وايت)..."
+                      className="text-xs h-9"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const val = e.currentTarget.value.trim();
+                          if (val && !form.colors.includes(val)) {
+                            setForm({ ...form, colors: [...form.colors, val] });
+                            e.currentTarget.value = "";
+                          }
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-9 shrink-0"
+                      onClick={() => {
+                        const input = document.getElementById("custom-color-input") as HTMLInputElement;
+                        const val = input?.value.trim();
+                        if (val && !form.colors.includes(val)) {
+                          setForm({ ...form, colors: [...form.colors, val] });
+                          input.value = "";
+                        }
+                      }}
+                    >
+                      إضافة
+                    </Button>
+                  </div>
+
+                  {form.colors.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-2">
+                      {form.colors.map((c) => (
+                        <Badge key={c} variant="secondary" className="gap-1 text-xs">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full inline-block border border-black/20"
+                            style={{ backgroundColor: getColorHex(c) }}
+                          />
+                          {c}
+                          <X
+                            size={12}
+                            className="cursor-pointer hover:text-destructive mr-1"
+                            onClick={() => setForm({ ...form, colors: form.colors.filter((x) => x !== c) })}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div>

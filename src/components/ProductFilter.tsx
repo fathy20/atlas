@@ -4,6 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { resolveMediaUrl } from "@/lib/media";
+import logoAtlas from "@/assets/logo-atlas.png";
+import { useMemo } from "react";
 
 interface ProductFilterProps {
   selectedCategory: string;
@@ -23,6 +25,10 @@ const ProductFilter = ({
   showAvailableOnly, setShowAvailableOnly,
 }: ProductFilterProps) => {
   const { categories, brands } = useData();
+
+  const hasAtlasInDb = useMemo(() => {
+    return brands.some((b) => b.name.toLowerCase().includes("atlas") || b.name.includes("أطلس"));
+  }, [brands]);
 
   return (
     <div className="space-y-6">
@@ -48,6 +54,16 @@ const ProductFilter = ({
           <SelectTrigger><SelectValue placeholder="كل الماركات" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">كل الماركات</SelectItem>
+
+            {!hasAtlasInDb && (
+              <SelectItem value="atlas">
+                <span className="flex items-center gap-2">
+                  <img src={logoAtlas} alt="أطلس" className="w-5 h-5 object-contain" />
+                  أطلس (Atlas)
+                </span>
+              </SelectItem>
+            )}
+
             {brands.map(b => (
               <SelectItem key={b.id} value={b.id}>
                 <span className="flex items-center gap-2">
