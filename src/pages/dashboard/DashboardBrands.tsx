@@ -3,6 +3,7 @@ import { useData } from "@/contexts/DataContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -25,10 +26,16 @@ const DashboardBrands = () => {
     name: "",
     slug: "",
     logo: "",
+    meta_title: "",
+    meta_title_ar: "",
+    meta_description: "",
+    meta_description_ar: "",
+    meta_keywords: "",
+    meta_keywords_ar: "",
   });
 
   const resetForm = () => {
-    setForm({ name: "", slug: "", logo: "" });
+    setForm({ name: "", slug: "", logo: "", meta_title: "", meta_title_ar: "", meta_description: "", meta_description_ar: "", meta_keywords: "", meta_keywords_ar: "" });
     setEditingBrand(null);
   };
 
@@ -38,6 +45,12 @@ const DashboardBrands = () => {
       name: b.name,
       slug: b.slug,
       logo: b.logo || "",
+      meta_title: b.meta_title || "",
+      meta_title_ar: b.meta_title_ar || "",
+      meta_description: b.meta_description || "",
+      meta_description_ar: b.meta_description_ar || "",
+      meta_keywords: b.meta_keywords || "",
+      meta_keywords_ar: b.meta_keywords_ar || "",
     });
     setDialogOpen(true);
   };
@@ -68,6 +81,12 @@ const DashboardBrands = () => {
           name: form.name.trim(),
           slug,
           logo: form.logo.trim() || null,
+          meta_title: form.meta_title.trim() || null,
+          meta_title_ar: form.meta_title_ar.trim() || null,
+          meta_description: form.meta_description.trim() || null,
+          meta_description_ar: form.meta_description_ar.trim() || null,
+          meta_keywords: form.meta_keywords.trim() || null,
+          meta_keywords_ar: form.meta_keywords_ar.trim() || null,
         });
         toast({ title: "تم تحديث الماركة بنجاح" });
       } else {
@@ -75,6 +94,12 @@ const DashboardBrands = () => {
           name: form.name.trim(),
           slug,
           logo: form.logo.trim() || null,
+          meta_title: form.meta_title.trim() || null,
+          meta_title_ar: form.meta_title_ar.trim() || null,
+          meta_description: form.meta_description.trim() || null,
+          meta_description_ar: form.meta_description_ar.trim() || null,
+          meta_keywords: form.meta_keywords.trim() || null,
+          meta_keywords_ar: form.meta_keywords_ar.trim() || null,
         });
         toast({ title: "تم إضافة الماركة بنجاح" });
       }
@@ -130,7 +155,7 @@ const DashboardBrands = () => {
               <Plus size={16} /> إضافة ماركة جديدة
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingBrand ? "تعديل الماركة" : "إضافة ماركة جديدة"}</DialogTitle>
             </DialogHeader>
@@ -196,6 +221,81 @@ const DashboardBrands = () => {
                       className="hidden"
                     />
                   </label>
+                </div>
+              </div>
+
+              {/* SEO Section */}
+              <div className="border-t border-border pt-4 mt-2">
+                <h3 className="font-semibold text-sm text-muted-foreground mb-3">SEO - تحسين محركات البحث</h3>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="mb-1 block text-sm">Meta Title (English)</Label>
+                      <Input
+                        placeholder="Brand SEO Title"
+                        value={form.meta_title}
+                        onChange={(e) => setForm({ ...form, meta_title: e.target.value })}
+                        className="text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground mt-0.5">60 حرف كحد أقصى</p>
+                    </div>
+                    <div>
+                      <Label className="mb-1 block text-sm">Meta Title (عربي)</Label>
+                      <Input
+                        placeholder="عنوان SEO للماركة"
+                        value={form.meta_title_ar}
+                        onChange={(e) => setForm({ ...form, meta_title_ar: e.target.value })}
+                        className="text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground mt-0.5">60 حرف كحد أقصى</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="mb-1 block text-sm">Meta Description (English)</Label>
+                      <Textarea
+                        placeholder="Brief description for search engines..."
+                        value={form.meta_description}
+                        onChange={(e) => setForm({ ...form, meta_description: e.target.value })}
+                        rows={2}
+                        className="text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground mt-0.5">160 حرف كحد أقصى</p>
+                    </div>
+                    <div>
+                      <Label className="mb-1 block text-sm">Meta Description (عربي)</Label>
+                      <Textarea
+                        placeholder="وصف مختصر لمحركات البحث..."
+                        value={form.meta_description_ar}
+                        onChange={(e) => setForm({ ...form, meta_description_ar: e.target.value })}
+                        rows={2}
+                        className="text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground mt-0.5">160 حرف كحد أقصى</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="mb-1 block text-sm">Keywords (English)</Label>
+                      <Input
+                        placeholder="keyword1, keyword2, keyword3"
+                        value={form.meta_keywords}
+                        onChange={(e) => setForm({ ...form, meta_keywords: e.target.value })}
+                        className="text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground mt-0.5">مفصولة بفاصلة</p>
+                    </div>
+                    <div>
+                      <Label className="mb-1 block text-sm">Keywords (عربي)</Label>
+                      <Input
+                        placeholder="كلمة1, كلمة2, كلمة3"
+                        value={form.meta_keywords_ar}
+                        onChange={(e) => setForm({ ...form, meta_keywords_ar: e.target.value })}
+                        className="text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground mt-0.5">مفصولة بفاصلة</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

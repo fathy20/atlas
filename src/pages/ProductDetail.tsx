@@ -9,13 +9,12 @@ import { ArrowRight, MessageCircle } from "lucide-react";
 import { companyInfo } from "@/data/products";
 import { resolveMediaUrl } from "@/lib/media";
 import { getColorHex } from "@/lib/colors";
-import { findProductBySlug } from "@/lib/slug";
 import { Helmet } from "react-helmet";
 import { supabase } from "@/integrations/supabase/client";
 import type { DbProduct } from "@/contexts/DataContext";
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { brandSlug, productSlug } = useParams();
   const { products, loading: contextLoading } = useData();
   const [fetchedProduct, setFetchedProduct] = useState<DbProduct | null>(null);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -25,39 +24,26 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   // Try to find in cached products first
-  const cachedProduct = findProductBySlug(products, id || '');
+  const cachedProduct = useMemo(() => {
+    return products.find(p => p.slug === productSlug);
+  }, [products, productSlug]);
 
   // If not in cache and context finished loading → fetch directly from DB
   useEffect(() => {
     if (cachedProduct || fetchDone) return;
     if (contextLoading) return; // wait for context first
 
-    const slug = id || '';
+    const slug = productSlug || '';
     if (!slug) { setFetchDone(true); return; }
 
     setFetchLoading(true);
 
     const tryFetch = async () => {
-      // Try exact slug match first
-      let { data } = await supabase
+      const { data } = await supabase
         .from("products")
         .select("*")
         .eq("slug", slug)
         .maybeSingle();
-
-      // Fallback: SEO slugs have appended keywords — scan all products
-      if (!data) {
-        const { data: allData } = await supabase
-          .from("products")
-          .select("*");
-        if (allData) {
-          data = allData.find((p) =>
-            slug === p.slug ||
-            slug.startsWith(p.slug + '-') ||
-            slug.includes(p.slug)
-          ) || null;
-        }
-      }
 
       setFetchedProduct(data || null);
       setFetchLoading(false);
@@ -65,7 +51,7 @@ const ProductDetail = () => {
     };
 
     tryFetch();
-  }, [id, cachedProduct, contextLoading, fetchDone]);
+  }, [productSlug, cachedProduct, contextLoading, fetchDone]);
 
   const product = cachedProduct || fetchedProduct;
   const isLoading = contextLoading || fetchLoading;

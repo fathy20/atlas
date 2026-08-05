@@ -19,6 +19,12 @@ export type Database = {
           created_at: string
           id: string
           logo: string | null
+          meta_title: string | null
+          meta_title_ar: string | null
+          meta_description: string | null
+          meta_description_ar: string | null
+          meta_keywords: string | null
+          meta_keywords_ar: string | null
           name: string
           slug: string
         }
@@ -26,6 +32,12 @@ export type Database = {
           created_at?: string
           id?: string
           logo?: string | null
+          meta_title?: string | null
+          meta_title_ar?: string | null
+          meta_description?: string | null
+          meta_description_ar?: string | null
+          meta_keywords?: string | null
+          meta_keywords_ar?: string | null
           name: string
           slug: string
         }
@@ -33,6 +45,12 @@ export type Database = {
           created_at?: string
           id?: string
           logo?: string | null
+          meta_title?: string | null
+          meta_title_ar?: string | null
+          meta_description?: string | null
+          meta_description_ar?: string | null
+          meta_keywords?: string | null
+          meta_keywords_ar?: string | null
           name?: string
           slug?: string
         }
@@ -73,6 +91,7 @@ export type Database = {
           available: boolean
           brand_id: string | null
           category_id: string | null
+          colors: string[] | null
           created_at: string
           description: string | null
           description_ar: string | null
@@ -80,6 +99,12 @@ export type Database = {
           id: string
           image: string | null
           images: string[] | null
+          meta_description: string | null
+          meta_description_ar: string | null
+          meta_keywords: string | null
+          meta_keywords_ar: string | null
+          meta_title: string | null
+          meta_title_ar: string | null
           name: string
           name_ar: string
           price: number
@@ -91,6 +116,7 @@ export type Database = {
           available?: boolean
           brand_id?: string | null
           category_id?: string | null
+          colors?: string[] | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
@@ -98,6 +124,12 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          meta_description?: string | null
+          meta_description_ar?: string | null
+          meta_keywords?: string | null
+          meta_keywords_ar?: string | null
+          meta_title?: string | null
+          meta_title_ar?: string | null
           name: string
           name_ar: string
           price?: number
@@ -109,6 +141,7 @@ export type Database = {
           available?: boolean
           brand_id?: string | null
           category_id?: string | null
+          colors?: string[] | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
@@ -116,6 +149,12 @@ export type Database = {
           id?: string
           image?: string | null
           images?: string[] | null
+          meta_description?: string | null
+          meta_description_ar?: string | null
+          meta_keywords?: string | null
+          meta_keywords_ar?: string | null
+          meta_title?: string | null
+          meta_title_ar?: string | null
           name?: string
           name_ar?: string
           price?: number

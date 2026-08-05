@@ -1,19 +1,29 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { DbProduct } from "@/contexts/DataContext";
+import type { DbProduct, DbBrand } from "@/contexts/DataContext";
+import { useData } from "@/contexts/DataContext";
 import { resolveMediaUrl } from "@/lib/media";
-import { generateSeoSlug } from "@/lib/slug";
+import logoAtlas from "@/assets/logo-atlas.png";
 
 interface ProductCardProps {
   product: DbProduct;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const seoSlug = generateSeoSlug(product);
+  const { brands } = useData();
+  
+  // Find brand for URL
+  let brandSlug = "atlas"; // default
+  if (product.brand_id) {
+    const brand = brands.find(b => b.id === product.brand_id);
+    if (brand) {
+      brandSlug = brand.slug;
+    }
+  }
   
   return (
-    <Link to={`/products/${seoSlug}`}>
+    <Link to={`/products/${brandSlug}/${product.slug}`}>
       <Card className="overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 h-full group">
         <div className="aspect-square bg-muted relative overflow-hidden">
           <img

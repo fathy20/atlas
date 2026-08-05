@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { Helmet } from "react-helmet";
 import ProductCard from "@/components/ProductCard";
 import ProductFilter from "@/components/ProductFilter";
 import { useData } from "@/contexts/DataContext";
@@ -17,31 +18,36 @@ const PRODUCTS_PER_PAGE = 12;
 
 const Products = () => {
   const { products, categories, brands, loading } = useData();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const brandParam = searchParams.get("brand") || "";
+  const { brandSlug } = useParams();
+  const navigate = useNavigate();
 
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBrand, setSelectedBrandState] = useState(brandParam);
   const [searchQuery, setSearchQuery] = useState("");
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Sync state with URL parameter
-  useEffect(() => {
-    setSelectedBrandState(brandParam);
-  }, [brandParam]);
+  // Determine selected brand from URL parameter
+  const selectedBrand = useMemo(() => {
+    if (!brandSlug) return "";
+    if (brandSlug === "atlas" && !brands.some(b => b.slug === "atlas")) return "atlas";
+    const found = brands.find(b => b.slug === brandSlug);
+    return found ? found.id : "";
+  }, [brandSlug, brands]);
 
-  const setSelectedBrand = (brandId: string) => {
-    setSelectedBrandState(brandId);
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (brandId) {
-        next.set("brand", brandId);
-      } else {
-        next.delete("brand");
-      }
-      return next;
-    });
+  const setSelectedBrand = (brandIdOrSlug: string) => {
+    if (!brandIdOrSlug) {
+      navigate("/products");
+      return;
+    }
+    // Find brand slug
+    let slug = brandIdOrSlug;
+    if (brandIdOrSlug === "atlas" && !brands.some(b => b.id === "atlas")) {
+      slug = "atlas";
+    } else {
+      const found = brands.find(b => b.id === brandIdOrSlug);
+      slug = found?.slug || brandIdOrSlug;
+    }
+    navigate(`/products/${slug}`);
   };
 
   const hasAtlasInDb = useMemo(() => {
@@ -138,6 +144,13 @@ const Products = () => {
   return (
     <>
       <SEOHead />
+      {selectedBrand && activeBrandObj?.meta_title_ar && (
+        <Helmet>
+          <title>{activeBrandObj.meta_title_ar}</title>
+          {activeBrandObj.meta_description_ar && <meta name="description" content={activeBrandObj.meta_description_ar} />}
+          {activeBrandObj.meta_keywords_ar && <meta name="keywords" content={activeBrandObj.meta_keywords_ar} />}
+        </Helmet>
+      )}
       <Navbar />
       <main className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
