@@ -145,42 +145,46 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const addCategory = useCallback(async (category: Omit<DbCategory, "id" | "created_at" | "updated_at">) => {
-    await supabase.from("categories").insert(category);
-    await fetchAll();
-  }, [fetchAll]);
+    const { data, error } = await supabase.from("categories").insert(category).select("*");
+    if (error) throw error;
+    if (data?.[0]) setCategories(prev => [...prev, data[0] as DbCategory]);
+  }, []);
 
   const updateCategory = useCallback(async (id: string, updates: Partial<DbCategory>) => {
-    await supabase.from("categories").update(updates).eq("id", id);
-    await fetchAll();
-  }, [fetchAll]);
+    const { data, error } = await supabase.from("categories").update(updates).eq("id", id).select("*");
+    if (error) throw error;
+    if (data?.[0]) setCategories(prev => prev.map(c => c.id === id ? data[0] as DbCategory : c));
+  }, []);
 
   const deleteCategory = useCallback(async (id: string) => {
-    await supabase.from("categories").delete().eq("id", id);
-    await fetchAll();
-  }, [fetchAll]);
+    const { error } = await supabase.from("categories").delete().eq("id", id);
+    if (error) throw error;
+    setCategories(prev => prev.filter(c => c.id !== id));
+  }, []);
 
   const addBrand = useCallback(async (brand: Omit<DbBrand, "id" | "created_at">) => {
-    const { error } = await supabase.from("brands").insert(brand);
+    const { data, error } = await supabase.from("brands").insert(brand).select("*");
     if (error) throw error;
-    await fetchAll();
-  }, [fetchAll]);
+    if (data?.[0]) setBrands(prev => [...prev, data[0] as DbBrand]);
+  }, []);
 
   const updateBrand = useCallback(async (id: string, updates: Partial<DbBrand>) => {
-    const { error } = await supabase.from("brands").update(updates).eq("id", id);
+    const { data, error } = await supabase.from("brands").update(updates).eq("id", id).select("*");
     if (error) throw error;
-    await fetchAll();
-  }, [fetchAll]);
+    if (data?.[0]) setBrands(prev => prev.map(b => b.id === id ? data[0] as DbBrand : b));
+  }, []);
 
   const deleteBrand = useCallback(async (id: string) => {
     const { error } = await supabase.from("brands").delete().eq("id", id);
     if (error) throw error;
-    await fetchAll();
-  }, [fetchAll]);
+    setBrands(prev => prev.filter(b => b.id !== id));
+  }, []);
 
   const updateSeoSetting = useCallback(async (id: string, updates: Partial<DbSeoSetting>) => {
-    await supabase.from("seo_settings").update(updates).eq("id", id);
-    await fetchAll();
-  }, [fetchAll]);
+    const { data, error } = await supabase.from("seo_settings").update(updates).eq("id", id).select("*");
+    if (error) throw error;
+    if (data?.[0]) setSeoSettings(prev => prev.map(s => s.id === id ? data[0] as DbSeoSetting : s));
+  }, []);
 
   return (
     <DataContext.Provider value={{

@@ -15,6 +15,7 @@ import { Plus, Pencil, Trash2, Search, Filter, Upload, X, ChevronLeft, ChevronRi
 import { useToast } from "@/hooks/use-toast";
 import type { DbProduct } from "@/contexts/DataContext";
 import { resolveMediaUrl } from "@/lib/media";
+import { processAndUploadImage } from "@/lib/upload";
 import { getColorHex, PRESET_COLORS } from "@/lib/colors";
 import RichTextEditor from "@/components/RichTextEditor";
 
@@ -186,15 +187,19 @@ const DashboardProducts = () => {
     console.log("Saving product data:", { 
       id: editingProduct?.id, 
       image: productData.image?.substring(0, 50) + "...",
-      imagesCount: productData.images.length 
+      imagesCount: productData.images.length,
+      imageDataSizeKB: Math.round(JSON.stringify(productData).length / 1024),
     });
 
     try {
+      const t0 = performance.now();
       if (editingProduct) {
         await updateProduct(editingProduct.id, productData);
+        console.log(`⏱ updateProduct took ${Math.round(performance.now() - t0)}ms`);
         toast({ title: "تم التحديث بنجاح" });
       } else {
         await addProduct(productData);
+        console.log(`⏱ addProduct took ${Math.round(performance.now() - t0)}ms`);
         toast({ title: "تم إضافة المنتج بنجاح" });
       }
       resetForm();
@@ -227,31 +232,22 @@ const DashboardProducts = () => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    // Convert images to base64 or upload to server
-    // For now, we'll create local URLs (you can replace this with actual upload to Supabase Storage)
-    const newImages: string[] = [];
-    
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const reader = new FileReader();
-      
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        newImages.push(base64String);
-        
-        // Update form when all images are processed
-        if (newImages.length === files.length) {
-          const updatedImages = [...form.images, ...newImages];
-          setForm({ 
-            ...form, 
-            images: updatedImages,
-            image: form.image || updatedImages[0]
-          });
-          toast({ title: "تم إضافة الصور بنجاح" });
-        }
-      };
-      
-      reader.readAsDataURL(file);
+    toast({ title: "جاري معالجة ورفع الصور..." });
+
+    try {
+      const uploadPromises = Array.from(files).map((file) => processAndUploadImage(file));
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      const updatedImages = [...form.images, ...uploadedUrls];
+      setForm((prev) => ({
+        ...prev,
+        images: updatedImages,
+        image: prev.image || updatedImages[0],
+      }));
+      toast({ title: "تم إضافة الصور بنجاح" });
+    } catch (err) {
+      console.error("Image processing error:", err);
+      toast({ title: "خطأ", description: "حدث خطأ أثناء معالجة الصور", variant: "destructive" });
     }
   };
 
@@ -407,16 +403,17 @@ const DashboardProducts = () => {
                     id="main-image-upload"
                     type="file"
                     accept="image/*"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64String = reader.result as string;
-                          setForm({ ...form, image: base64String });
+                        toast({ title: "جاري معالجة ورفع الصورة..." });
+                        try {
+                          const url = await processAndUploadImage(file);
+                          setForm((prev) => ({ ...prev, image: url }));
                           toast({ title: "تم رفع الصورة الرئيسية" });
-                        };
-                        reader.readAsDataURL(file);
+                        } catch (err) {
+                          toast({ title: "خطأ", description: "فشل رفع الصورة", variant: "destructive" });
+                        }
                       }
                     }}
                     className="hidden"

@@ -11,6 +11,7 @@ import { Plus, Pencil, Trash2, Search, Upload, Image as ImageIcon } from "lucide
 import { useToast } from "@/hooks/use-toast";
 import type { DbBrand } from "@/contexts/DataContext";
 import { resolveMediaUrl } from "@/lib/media";
+import { processAndUploadImage } from "@/lib/upload";
 
 const DashboardBrands = () => {
   const { brands, products, addBrand, updateBrand, deleteBrand } = useData();
@@ -55,16 +56,17 @@ const DashboardBrands = () => {
     setDialogOpen(true);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm((prev) => ({ ...prev, logo: reader.result as string }));
+    try {
+      const url = await processAndUploadImage(file);
+      setForm((prev) => ({ ...prev, logo: url }));
       toast({ title: "تم رفع الشعار بنجاح" });
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      toast({ title: "خطأ", description: "فشل رفع الشعار", variant: "destructive" });
+    }
   };
 
   const handleSubmit = async () => {
