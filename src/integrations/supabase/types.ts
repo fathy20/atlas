@@ -91,6 +91,7 @@ export type Database = {
           available: boolean
           brand_id: string | null
           category_id: string | null
+          color_images: Record<string, string> | null
           colors: string[] | null
           created_at: string
           description: string | null
@@ -116,6 +117,7 @@ export type Database = {
           available?: boolean
           brand_id?: string | null
           category_id?: string | null
+          color_images?: Record<string, string> | null
           colors?: string[] | null
           created_at?: string
           description?: string | null
@@ -141,6 +143,7 @@ export type Database = {
           available?: boolean
           brand_id?: string | null
           category_id?: string | null
+          color_images?: Record<string, string> | null
           colors?: string[] | null
           created_at?: string
           description?: string | null

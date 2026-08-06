@@ -45,6 +45,7 @@ const DashboardProducts = () => {
     sku: "",
     image: "", images: [] as string[],
     colors: [] as string[],
+    color_images: {} as Record<string, string>,
     meta_title: "", meta_title_ar: "", meta_description: "", meta_description_ar: "",
     meta_keywords: "", meta_keywords_ar: "",
   });
@@ -55,6 +56,7 @@ const DashboardProducts = () => {
       price: 0, category_id: "", brand_id: "", available: true, 
       features: "", slug: "", sku: "", image: "", images: [],
       colors: [],
+      color_images: {},
       meta_title: "", meta_title_ar: "", meta_description: "", meta_description_ar: "",
       meta_keywords: "", meta_keywords_ar: "",
     });
@@ -72,6 +74,7 @@ const DashboardProducts = () => {
       sku: p.sku || "",
       image: p.image || "", images: p.images || [],
       colors: (p as any).colors || [],
+      color_images: (p as any).color_images || {},
       meta_title: (p as any).meta_title || "", meta_title_ar: (p as any).meta_title_ar || "",
       meta_description: (p as any).meta_description || "", meta_description_ar: (p as any).meta_description_ar || "",
       meta_keywords: (p as any).meta_keywords || "", meta_keywords_ar: (p as any).meta_keywords_ar || "",
@@ -168,6 +171,7 @@ const DashboardProducts = () => {
       image: primaryImage, 
       images: finalImages,
       colors: form.colors,
+      color_images: Object.keys(form.color_images).length > 0 ? form.color_images : null,
       features: form.features.split(",").map(f => f.trim()).filter(Boolean),
       available: form.available,
       sku: form.sku || null,
@@ -418,7 +422,7 @@ const DashboardProducts = () => {
                     className="hidden"
                   />
                   {form.image && (
-                    <div className="mt-2">
+                    <div className="mt-2 space-y-1">
                       <img
                         src={resolveMediaUrl(form.image)}
                         onError={(e) => {
@@ -428,6 +432,26 @@ const DashboardProducts = () => {
                         alt="Preview"
                         className="w-32 h-32 object-cover rounded border"
                       />
+                      {form.colors.length > 0 && (
+                        <select
+                          value={Object.entries(form.color_images).find(([, url]) => url === form.image)?.[0] || ""}
+                          onChange={(e) => {
+                            const newColorImages = { ...form.color_images };
+                            // Remove old mapping for this image
+                            Object.entries(newColorImages).forEach(([color, url]) => {
+                              if (url === form.image) delete newColorImages[color];
+                            });
+                            if (e.target.value) newColorImages[e.target.value] = form.image;
+                            setForm({ ...form, color_images: newColorImages });
+                          }}
+                          className="w-32 text-xs border border-border rounded px-1 py-0.5 bg-background text-foreground"
+                        >
+                          <option value="">— ربط بلون —</option>
+                          {form.colors.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      )}
                     </div>
                   )}
                 </div>
@@ -466,45 +490,82 @@ const DashboardProducts = () => {
                   />
                   {form.images.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mt-3">
-                      {form.images.map((img, idx) => (
-                        <div key={idx} className="relative group">
-                          <img
-                            src={resolveMediaUrl(img)}
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = resolveMediaUrl();
-                            }}
-                            alt=""
-                            className="w-full h-20 object-cover rounded border"
-                          />
-                          <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => setForm({ ...form, image: img })}
-                              title="جعلها الصورة الرئيسية"
-                            >
-                              ⭐
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => removeImage(idx)}
-                            >
-                              <X size={12} />
-                            </Button>
-                          </div>
-                          {form.image === img && (
-                            <div className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
-                              رئيسية
+                      {form.images.map((img, idx) => {
+                        // Find if this image is linked to a color
+                        const linkedColor = Object.entries(form.color_images).find(([, url]) => url === img)?.[0] || "";
+                        return (
+                          <div key={idx} className="relative group space-y-1">
+                            <div className="relative">
+                              <img
+                                src={resolveMediaUrl(img)}
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = resolveMediaUrl();
+                                }}
+                                alt=""
+                                className="w-full h-20 object-cover rounded border"
+                              />
+                              <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => setForm({ ...form, image: img })}
+                                  title="جعلها الصورة الرئيسية"
+                                >
+                                  ⭐
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => {
+                                    // Remove image and clean up any color_images mapping for it
+                                    const newColorImages = { ...form.color_images };
+                                    Object.entries(newColorImages).forEach(([color, url]) => {
+                                      if (url === img) delete newColorImages[color];
+                                    });
+                                    setForm({ ...form, images: form.images.filter((_, i) => i !== idx), color_images: newColorImages });
+                                  }}
+                                >
+                                  <X size={12} />
+                                </Button>
+                              </div>
+                              {form.image === img && (
+                                <div className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded">
+                                  رئيسية
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ))}
+                            {/* Color link selector */}
+                            {form.colors.length > 0 && (
+                              <select
+                                value={linkedColor}
+                                onChange={(e) => {
+                                  const newColorImages = { ...form.color_images };
+                                  // Remove old mapping for this image
+                                  Object.entries(newColorImages).forEach(([color, url]) => {
+                                    if (url === img) delete newColorImages[color];
+                                  });
+                                  // Add new mapping
+                                  if (e.target.value) {
+                                    newColorImages[e.target.value] = img;
+                                  }
+                                  setForm({ ...form, color_images: newColorImages });
+                                }}
+                                className="w-full text-xs border border-border rounded px-1 py-0.5 bg-background text-foreground"
+                              >
+                                <option value="">— ربط بلون —</option>
+                                {form.colors.map((c) => (
+                                  <option key={c} value={c}>{c}</option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground mt-2">

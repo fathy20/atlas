@@ -93,11 +93,38 @@ const ProductDetail = () => {
     return [];
   }, [product]);
 
+  // Color → image mapping
+  const colorImages: Record<string, string> = useMemo(() => {
+    return (product as any)?.color_images || {};
+  }, [product]);
+
+  // When color selected, switch image if mapped
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+    if (colorImages[color]) {
+      const idx = allImages.indexOf(colorImages[color]);
+      if (idx !== -1) setSelectedImageIndex(idx);
+      else {
+        // image not in allImages list yet — still show via override
+        setSelectedImageIndex(-1);
+      }
+    }
+  };
+
   useEffect(() => {
     if (colorsList.length > 0 && !selectedColor) {
       setSelectedColor(colorsList[0]);
+      if (colorImages[colorsList[0]]) {
+        const idx = allImages.indexOf(colorImages[colorsList[0]]);
+        if (idx !== -1) setSelectedImageIndex(idx);
+      }
     }
-  }, [colorsList, selectedColor]);
+  }, [colorsList, selectedColor, colorImages, allImages]);
+
+  // The image to display — may be overridden by color selection
+  const displayImage = selectedColor && colorImages[selectedColor]
+    ? colorImages[selectedColor]
+    : (allImages[selectedImageIndex] || allImages[0]);
 
   // Show spinner while loading
   if (isLoading && !product) {
@@ -163,7 +190,7 @@ const ProductDetail = () => {
             <div className="space-y-4">
               <div className="bg-card border border-border/80 rounded-2xl aspect-square flex items-center justify-center p-4 shadow-sm overflow-hidden relative group">
                 <img
-                  src={resolveMediaUrl(allImages[selectedImageIndex] || product.image)}
+                  src={resolveMediaUrl(displayImage)}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     e.currentTarget.src = resolveMediaUrl();
@@ -237,7 +264,7 @@ const ProductDetail = () => {
                         <button
                           key={color}
                           type="button"
-                          onClick={() => setSelectedColor(color)}
+                          onClick={() => handleColorSelect(color)}
                           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-medium transition-all duration-200 ${
                             isSelected
                               ? "border-primary bg-primary/10 text-primary ring-2 ring-primary/30 font-bold shadow-sm"

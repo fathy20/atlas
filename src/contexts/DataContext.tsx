@@ -105,7 +105,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const addProduct = useCallback(async (product: Omit<DbProduct, "id" | "created_at" | "updated_at">) => {
-    const { data, error } = await supabase.from("products").insert(product).select("id");
+    const { data, error } = await supabase.from("products").insert(product).select("*");
     if (error) {
       console.error("Add product error:", error);
       throw error;
@@ -113,11 +113,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!data || data.length === 0) {
       throw new Error("لم يتم إنشاء المنتج. تحقق من تسجيل الدخول وصلاحية الأدمن.");
     }
-    await fetchAll();
-  }, [fetchAll]);
+    // Instantly prepend the new product to local state — no full refetch needed
+    setProducts(prev => [data[0] as DbProduct, ...prev]);
+  }, []);
 
   const updateProduct = useCallback(async (id: string, updates: Partial<DbProduct>) => {
-    const { data, error } = await supabase.from("products").update(updates).eq("id", id).select("id");
+    const { data, error } = await supabase.from("products").update(updates).eq("id", id).select("*");
     if (error) {
       console.error("Update product error:", error);
       throw error;
@@ -125,8 +126,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!data || data.length === 0) {
       throw new Error("لم يتم تحديث المنتج. تحقق من تسجيل الدخول وصلاحية الأدمن.");
     }
-    await fetchAll();
-  }, [fetchAll]);
+    // Instantly patch just this product in local state — no full refetch needed
+    const updated = data[0] as DbProduct;
+    setProducts(prev => prev.map(p => p.id === id ? updated : p));
+  }, []);
 
   const deleteProduct = useCallback(async (id: string) => {
     const { data, error } = await supabase.from("products").delete().eq("id", id).select("id");
@@ -137,8 +140,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!data || data.length === 0) {
       throw new Error("لم يتم حذف المنتج. تحقق من تسجيل الدخول وصلاحية الأدمن.");
     }
-    await fetchAll();
-  }, [fetchAll]);
+    // Instantly remove from local state — no full refetch needed
+    setProducts(prev => prev.filter(p => p.id !== id));
+  }, []);
 
   const addCategory = useCallback(async (category: Omit<DbCategory, "id" | "created_at" | "updated_at">) => {
     await supabase.from("categories").insert(category);
